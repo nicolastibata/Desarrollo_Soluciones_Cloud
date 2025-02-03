@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nicolas Todo List App</title>
+</head>
+<body>
+    <form action="{{ url_for('edit', index=index )}}" method="post">
+        <input type="text" name="todo", value="{{ todo['task'] }}">
+        <input type="date" name="deadline" value="{{ todo['deadline'] }}">
+        <select name="category">
+            <option value="Hogar" {% if todo['category'] == 'Hogar' %} selected {% endif %}>Hogar</option>
+            <option value="Trabajo" {% if todo['category'] == 'Trabajo' %} selected {% endif %}>Trabajo</option>
+            <option value="Personal" {% if todo['category'] == 'Personal' %} selected {% endif %}>Personal</option>
+        </select>
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>

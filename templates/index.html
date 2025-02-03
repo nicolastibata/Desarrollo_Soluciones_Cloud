@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nicolas Todo List App</title>
+</head>
+<body>
+    <h1>Todos</h1>
+    <p>Bienvenido, {{ current_user.username }}! <a href="{{ url_for('logout') }}">Cerrar sesión</a></p>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Lista de tareas -->
+    <ul>
+        {% for todo in todos %}
+            <li>
+                <!-- Checkbox para marcar como completada -->
+                <input type="checkbox" name="done" {% if todo.done %} checked {% endif %} disabled>
+                
+                <!-- Tarea con estilo si está completada -->
+                <span {% if todo.done %} style="text-decoration: line-through" {% endif %}>
+                    {{ todo.task }}
+                </span>
+
+                <!-- Fecha de creación y deadline -->
+                <span>Created: {{ todo.created_at }}</span>
+                <span>Deadline: {{ todo.deadline }}</span>
+
+                <!-- Categoría -->
+                <span>Category: {{ todo.category }}</span>
+
+                <!-- Estado de la tarea -->
+                <form action="{{ url_for('change_status', index=todo.id) }}" method="post" style="display:inline;">
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="sin iniciar" {% if todo.status == 'sin iniciar' %} selected {% endif %}>Sin iniciar</option>
+                        <option value="iniciada" {% if todo.status == 'iniciada' %} selected {% endif %}>Iniciada</option>
+                        <option value="finalizada" {% if todo.status == 'finalizada' %} selected {% endif %}>Finalizada</option>
+                    </select>
+                </form>
+
+                <!-- Enlaces para editar y eliminar -->
+                <a href="{{ url_for('edit', index=todo.id) }}">Edit</a>
+                <a href="{{ url_for('delete', index=todo.id) }}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Formulario para agregar una nueva tarea -->
+    <form action="{{ url_for('add') }}" method="post">
+        <input type="text" name="todo" placeholder="Nueva tarea" required>
+        <input type="date" name="deadline" placeholder="Fecha límite">
+        <select name="category">
+            <option value="Hogar">Hogar</option>
+            <option value="Trabajo">Trabajo</option>
+            <option value="Personal" selected>Personal</option>
+        </select>
+        <button type="submit">Add Todo</button>
+    </form>
+
+    <!-- Enlace para registrarse o iniciar sesión (si no está autenticado) -->
+    {% if not current_user.is_authenticated %}
+        <p>¿No tienes una cuenta? <a href="{{ url_for('register') }}">Regístrate</a></p>
+        <p>¿Ya tienes una cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+    {% endif %}
+</body>
+</html>
